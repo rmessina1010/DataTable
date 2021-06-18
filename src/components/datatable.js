@@ -6,7 +6,7 @@ export function DTTD(props) {
     if (props.subs && props.subs[props.data]) { props.data = props.subs[props.data]; }
     switch (props.type) {
         case 'img':
-            content = props.data ? <img src={props.data} /> : null;
+            content = props.data ? <img src={props.data} alt={props.alt || ""} /> : null;
             break;
         case 'html':
             content = null;
@@ -16,10 +16,10 @@ export function DTTD(props) {
             content = props.data.toString();
     }
     if (props.link) {
-        content = <a href={props.link} dangerouslySetInnerHTML={risk}>{content}</a>;
+        content = risk ? <a href={props.link} dangerouslySetInnerHTML={risk} /> : <a href={props.link}>{content}</a>;
         risk = null;
     }
-    return (<td key={'td-' + props.col + props.rowid} dangerouslySetInnerHTML={risk}>{content}</td>)
+    return (risk ? <td key={'td-' + props.col + props.rowid} dangerouslySetInnerHTML={risk} /> : <td key={'td-' + props.col + props.rowid}>{content}</td>)
 }
 
 export function DTTH(props) {
