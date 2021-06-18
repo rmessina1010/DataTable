@@ -8,6 +8,7 @@ function App() {
       tableAttrs={{ class: 'sample-table' }}
       sortMap={{ GLIID: true, GLIOrd: true, QTY: true, Needed: true }}
       types={{ image: 'img' }}
+      rClick={(a) => alert(a.ItemName)}
     />
   )
 }

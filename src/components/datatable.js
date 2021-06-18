@@ -3,23 +3,23 @@ import React, { Component } from 'react';
 export function DTTD(props) {
     let risk = null;
     let content = null;
-    if (props.subs && props.subs[props.data]) { props.data = props.subs[props.data]; }
+    let data = (props?.subs[props.data]) ? props.subs[props.data] : props.data;
     switch (props.type) {
         case 'img':
-            content = props.data ? <img src={props.data} alt={props.alt || ""} /> : null;
+            content = data ? <img src={data} alt={props.alt || ""} /> : null;
             break;
         case 'html':
             content = null;
-            risk = props.data;
+            risk = data;
             break;
         default:
-            content = props.data.toString();
+            content = data.toString();
     }
     if (props.link) {
-        content = risk ? <a href={props.link} dangerouslySetInnerHTML={risk} /> : <a href={props.link}>{content}</a>;
+        content = risk ? <a href={props.link} dangerouslySetInnerHTML={{ __html: risk }} /> : <a href={props.link}>{content}</a>;
         risk = null;
     }
-    return (risk ? <td key={'td-' + props.col + props.rowid} dangerouslySetInnerHTML={risk} /> : <td key={'td-' + props.col + props.rowid}>{content}</td>)
+    return (risk ? <td key={'td-' + props.col + props.rowid} dangerouslySetInnerHTML={{ __html: risk }} /> : <td key={'td-' + props.col + props.rowid}>{content}</td>)
 }
 
 export function DTTH(props) {
@@ -39,15 +39,16 @@ export function DataTableHead({ cols, labelMap, sort }) {
 }
 
 export function DataTableBody(props) {
-    let trows = Array.isArray(props.data) ? props.data.map((rowData, rowKey) => {
-        rowKey = rowData[props.keycol] || rowKey;
+    let trows = Array.isArray(props.data) ? props.data.map((rowData, rIndex) => {
+        let rowKey = rowData[props.keycol] || rIndex;
         let theCells = props.cols.map(col => {
             let type = props.typeMap[col] || null;
             let link = props.linkMap[col] ? rowData[props.linkMap[col]] : null;
             let subs = props.subs[col] || {};
             return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} />);
         });
-        return <tr key={"row-" + rowKey}>{theCells}</tr>
+        let clickFoo = (foo, row, index, props) => typeof foo === 'function' ? () => foo(row, index, { ...props, rClick: null }) : null;
+        return <tr key={"row-" + rowKey} onClick={clickFoo(props.rClick, rowData, rIndex, props)}>{theCells}</tr>
     })
         : [];
 
@@ -114,7 +115,7 @@ class DataTable extends Component {
         return this.state.sortedData ? (
             <table {...this.props.tableAttrs}>
                 <DataTableHead cols={this.state.theCols} sort={this.clickToSort} labels={this.state.labelMap} />
-                <DataTableBody cols={this.state.theCols} data={this.state.sortedData} typeMap={this.state.typeMap} linkMap={this.state.linkMap} subs={this.state.subMap} />
+                <DataTableBody cols={this.state.theCols} data={this.state.sortedData} typeMap={this.state.typeMap} linkMap={this.state.linkMap} subs={this.state.subMap} rClick={this.props.rClick} />
             </table>
 
         ) : (<div>{this.state.status}</div>);
