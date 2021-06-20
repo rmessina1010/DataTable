@@ -1,14 +1,16 @@
-import DataTable from './components/datatable';
+import MainComponent from './components/external';
 function App() {
   return (
-    <DataTable
+    <MainComponent
       url='https://sharelist.raymessinadesign.com/service.php'
-      ascClass='sort-asc'
-      descClass='sort-desc'
-      tableAttrs={{ class: 'sample-table' }}
-      sortMap={{ GLIID: true, GLIOrd: true, QTY: true, Needed: true }}
-      types={{ image: 'img' }}
-      rClick={(a) => alert(a.ItemName)}
+      dataT={{
+        ascClass: 'sort-asc',
+        descClass: 'sort-desc',
+        tableAttrs: { class: 'sample-table' },
+        sortMap: { GLIID: true, GLIOrd: true, QTY: true, Needed: true },
+        types: { image: 'img' },
+        rClick: (a) => alert(a.ItemName)
+      }}
     />
   )
 }
