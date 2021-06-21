@@ -98,17 +98,21 @@ class DataTable extends Component {
 
     componentDidMount() { this.refreshData(); }
     componentDidUpdate() {
-        if (this.state.url && this.props.url !== this.state.url) { this.refreshData(); }
+        if (this.state.url && this.props.source !== this.state.url) { this.refreshData(); }
     }
 
     refreshData() {
-        fetch(this.props.url)
-            .then(resp => resp.status === 200 ? resp.json() : null)
-            .then(resp => {
-                let status = resp ? 'connected.' : 'connection failure.'
-                this.setState({ url: this.props.url, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols: this.props.cols || Object.keys(resp[0]) })
-            })
-            .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
+        if (typeof this.props.source === 'string' || this.props.source instanceof String) {
+            fetch(this.props.source)
+                .then(resp => resp.status === 200 ? resp.json() : null)
+                .then(resp => {
+                    let status = resp ? 'connected.' : 'connection failure.'
+                    this.setState({ url: this.props.source, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols: this.props.cols || Object.keys(resp[0]) })
+                })
+                .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
+        } else if (Array.isArray(this.props.source)) {
+            this.setState({ url: this.props.source, theData: this.props.source, sortedData: this.props.source, status: 'connected.', sortKey: null, sortDir: null, theCols: this.props.cols || Object.keys(this.props.source[0]) })
+        }
     }
 
     render() {

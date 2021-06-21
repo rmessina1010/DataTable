@@ -6,7 +6,7 @@ function App() {
       dataT={{
         ascClass: 'sort-asc',
         descClass: 'sort-desc',
-        tableAttrs: { class: 'sample-table' },
+        tableAttrs: { className: 'sample-table' },
         sortMap: { GLIID: true, GLIOrd: true, QTY: true, Needed: true },
         types: { image: 'img' },
         rClick: (a) => alert(a.ItemName)

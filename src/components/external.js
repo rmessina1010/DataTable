@@ -49,7 +49,7 @@ class MainComponent extends Component {
             <div>
                 <Url update={this.changeURL} default={this.state.url} />
                 <DataTable
-                    url={this.state.url}
+                    source={[{}, {}, {}, {}, {}, {}, {}, {}]}
                     {...this.props.dataT}
                 />
             </div>
