@@ -24,22 +24,23 @@ export function DTTD(props) {
 
 export function DTTH(props) {
     let col = props.col || props.title;
-    return (<th onClick={props.sort} key={'th-' + col} data-srt={col}>{props.title}</th>);
+    return col ? (<th onClick={props.sort} key={'th-' + col} data-srt={col}>{props.title}</th>) : null;
 }
 
 export function DataTableHead({ cols, labelMap, sort }) {
     let ths = cols.map(col => <DTTH title={(labelMap && labelMap[col]) ? labelMap[col] : col} sort={sort} />)
     return (
         <thead>
-            <tr>
-                {ths}
-            </tr>
+
+            {ths.length > 0 ? (<tr>{ths} </tr>) : null}
+
         </thead>
-    )
+    );
 }
 
 export function DataTableBody(props) {
     let trows = Array.isArray(props.data) ? props.data.map((rowData, rIndex) => {
+        if (Object.keys(rowData).length < 1) { return null; }
         let rowKey = rowData[props.keycol] || rIndex;
         let theCells = props.cols.map(col => {
             let type = props.typeMap[col] || null;
