@@ -4,6 +4,7 @@ export function DTTD(props) {
     let risk = null;
     let content = null;
     let data = (props?.subs[props.data]) ? props.subs[props.data] : props.data;
+    if (props.col === undefined) { return null; }
     switch (props.type) {
         case 'img':
             content = data ? <img src={data} alt={props.alt || ""} /> : null;
@@ -13,7 +14,7 @@ export function DTTD(props) {
             risk = data;
             break;
         default:
-            content = data.toString();
+            content = data?.toString();
     }
     if (props.link) {
         content = risk ? <a href={props.link} dangerouslySetInnerHTML={{ __html: risk }} /> : <a href={props.link}>{content}</a>;
@@ -46,7 +47,7 @@ export function DataTableBody(props) {
             let type = props.typeMap[col] || null;
             let link = props.linkMap[col] ? rowData[props.linkMap[col]] : null;
             let subs = props.subs[col] || {};
-            return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} />);
+            return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} alt={null} />);
         });
         let clickFoo = (foo, row, index, props) => typeof foo === 'function' ? () => foo(row, index, { ...props, rClick: null }) : null;
         return <tr key={"row-" + rowKey} onClick={clickFoo(props.rClick, rowData, rIndex, props)}>{theCells}</tr>
