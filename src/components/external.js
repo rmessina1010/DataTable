@@ -16,16 +16,22 @@ export class Url extends Component {
         this.setState({ url: e.target.value });
     }
 
-    update() {
-        this.props.update(this.state.url);
+    update(what) {
+        this.props.update(what);
     }
 
     render() {
+
         return (
-            <div>
-                <label>Source URL:</label>
-                <input name='sourceURL' id="sourceURL" value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update() : null} />
-            </div>
+            <div className="demo-ctrl">
+                <div>
+                    <label>Enter Source URL: </label>
+                    <input name='sourceURL' id="sourceURL" value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
+                </div>
+                <div>
+                    <button onClick={() => this.update(this.props.sample)}>Or Use Sample Data</button>
+                </div>
+            </div >
         )
     }
 }
@@ -35,21 +41,26 @@ class MainComponent extends Component {
         super(props);
         this.state = {
             url: this.props.url,
-            t: 15
+            t: 15,
+            source: this.props.url
         }
         this.changeURL = this.changeURL.bind(this);
     }
 
     changeURL(newURL) {
-        this.setState({ url: newURL })
+        this.setState({ source: newURL })
     }
 
     render() {
         return (
-            <div>
-                <Url update={this.changeURL} default={this.state.url} />
+            <div >
+                <Url
+                    update={this.changeURL}
+                    default={this.state.url}
+                    sample={[{ a: 1, c: 1 }, { b: 1, a: 0 }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
+                />
                 <DataTable
-                    source={[{ a: 1, c: 1 }, { b: 1, a: 0 }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
+                    source={this.state.source}
                     {...this.props.dataT}
                 />
             </div>

@@ -1,26 +1,32 @@
-			.sample-table .up{ color:green;}
-			.sample-table .down{ color:red;}
-			.sample-table th { cursor: pointer;
- 			}
-			.sample-table{
-				border: 3px solid #222;
-				border-collapse: collapse;
-				margin-top: .5em;
-			}
-			.sample-table td, .sample-table th {
-				border: 1px solid #555;
-				padding: 10px;
-			}
-			.sample-table tr:nth-child(2n){ background: #ddd;}
-			.sample-table tr:hover{ background: pink;}
-			.sample-table th {
- 			 background: #222;
- 			 color:#ddd;
- 		   }
+.sample-table .up{ color:green;}
+.sample-table .down{ color:red;}
+.sample-table th { cursor: pointer;
+}
+.sample-table{
+	border: 3px solid #222;
+	border-collapse: collapse;
+	margin: .5em auto;
+}
+.sample-table td, .sample-table th {
+	border: 1px solid #555;
+	padding: 10px;
+}
+.sample-table tr:nth-child(2n){ background: #ddd;}
+.sample-table tr:hover{ background: pink;}
+.sample-table th {
+	background: #222;
+	color:#ddd;
+}
 
- 		   .sample-table th.sort-asc { color:green; }
- 		   .sample-table th.sort-desc { color:red; }
- 		   .sample-table th:after, .sample-table th.sort-asc:after, .sample-table th.sort-desc:after { content: ''; height: 0; width: 0; border: 4px solid transparent; display: inline-block; margin-left: 1em; position: relative;}
- 		   .sample-table th.sort-asc:after{ border-bottom-color:green; top:-4px;}
- 		   .sample-table th.sort-desc:after{ border-top-color:red; top:4px;}
- 		   .sample-table td img { width: 60px;}
+.sample-table th.sort-asc { color:green; }
+.sample-table th.sort-desc { color:red; }
+.sample-table th:after, .sample-table th.sort-asc:after, .sample-table th.sort-desc:after { content: ''; height: 0; width: 0; border: 4px solid transparent; display: inline-block; margin-left: 1em; position: relative;}
+.sample-table th.sort-asc:after{ border-bottom-color:green; top:-4px;}
+.sample-table th.sort-desc:after{ border-top-color:red; top:4px;}
+.sample-table td img { width: 60px;}
+
+.demo-ctrl{
+	padding: .5em 1em;
+	text-align: center;
+}
+.demo-ctrl div{ padding: .5em 0;}

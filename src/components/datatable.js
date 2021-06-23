@@ -103,7 +103,7 @@ class DataTable extends Component {
 
     componentDidMount() { this.refreshData(); }
     componentDidUpdate() {
-        if (this.state.url && this.props.source !== this.state.url) { this.refreshData(); }
+        if (this.state.url && this.props.source !== this.state.url) { this.refreshData(); }///check logic!!!
     }
 
     refreshData() {
