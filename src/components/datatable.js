@@ -42,15 +42,18 @@ export function DataTableHead({ cols, labelMap, sort }) {
 export function DataTableBody(props) {
     let trows = Array.isArray(props.data) ? props.data.map((rowData, rIndex) => {
         if (Object.keys(rowData).length < 1) { return null; }
+        let isRowDefined = false;
         let rowKey = rowData[props.keycol] || rIndex;
         let theCells = props.cols.map(col => {
+            if (typeof rowData[col] !== 'undefined') { isRowDefined = true; }
             let type = props.typeMap[col] || null;
             let link = props.linkMap[col] ? rowData[props.linkMap[col]] : null;
             let subs = props.subs[col] || {};
             return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} alt={null} />);
         });
         let clickFoo = (foo, row, index, props) => typeof foo === 'function' ? () => foo(row, index, { ...props, rClick: null }) : null;
-        return <tr key={"row-" + rowKey} onClick={clickFoo(props.rClick, rowData, rIndex, props)}>{theCells}</tr>
+        return (!props.undefRows && !isRowDefined) ? null :
+            (<tr key={"row-" + rowKey} onClick={clickFoo(props.rClick, rowData, rIndex, props)}>{theCells}</tr>)
     })
         : [];
 
@@ -120,8 +123,20 @@ class DataTable extends Component {
     render() {
         return this.state.sortedData ? (
             <table {...this.props.tableAttrs}>
-                <DataTableHead cols={this.state.theCols} sort={this.clickToSort} labels={this.state.labelMap} />
-                <DataTableBody cols={this.state.theCols} data={this.state.sortedData} typeMap={this.state.typeMap} linkMap={this.state.linkMap} subs={this.state.subMap} rClick={this.props.rClick} />
+                <DataTableHead
+                    cols={this.state.theCols}
+                    sort={this.clickToSort}
+                    labels={this.state.labelMap}
+                />
+                <DataTableBody
+                    cols={this.state.theCols}
+                    data={this.state.sortedData}
+                    typeMap={this.state.typeMap}
+                    linkMap={this.state.linkMap}
+                    subs={this.state.subMap}
+                    rClick={this.props.rClick}
+                    undefRows={this.props.undefRows}
+                />
             </table>
 
         ) : (<div>{this.state.status}</div>);
