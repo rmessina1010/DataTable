@@ -62,6 +62,7 @@ class MainComponent extends Component {
                 <DataTable
                     source={this.state.source}
                     {...this.props.dataT}
+                    preProcess={a => { alert('preprocessor ran successfully'); return []; }}
                 />
             </div>
         );
