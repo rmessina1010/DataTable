@@ -30,6 +30,7 @@ export class Url extends Component {
                 </div>
                 <div>
                     <button onClick={() => this.update(this.props.sample)}>Or Use Sample Data</button>
+                    {(typeof this.props.refresh === 'function') ? <button onClick={this.props.refresh}>Refresh</button> : null}
                 </div>
             </div >
         )
@@ -42,7 +43,8 @@ class MainComponent extends Component {
         this.state = {
             url: this.props.url,
             t: 15,
-            source: this.props.url
+            source: this.props.url,
+            force: false
         }
         this.changeURL = this.changeURL.bind(this);
     }
@@ -58,11 +60,13 @@ class MainComponent extends Component {
                     update={this.changeURL}
                     default={this.state.url}
                     sample={[{ a: 1, c: 1 }, { b: 1, a: 0 }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
+                // refresh={() => this.setState(oldState => ({ ...oldState, force: !oldState.force }))}
                 />
                 <DataTable
                     source={this.state.source}
                     {...this.props.dataT}
-                    preProcess={a => { alert('preprocessor ran successfully'); return a; }}
+                //   preProcess={a => { alert('preprocessor ran successfully'); return a; }}
+                // force={this.state.force}
                 />
             </div>
         );

@@ -75,7 +75,8 @@ class DataTable extends Component {
             status: 'connecting...',
             sortKey: null,
             sortDir: null,
-            url: null
+            url: null,
+            force: this.props.force
         }
         this.clickToSort = this.clickToSort.bind(this);
         this.ordCol = null;
@@ -101,9 +102,9 @@ class DataTable extends Component {
         this.setState({ sortedData: newData, sortKey: key, sortDir: asc })
     }
 
-    componentDidMount() { this.refreshData('mount'); }
+    componentDidMount() { this.refreshData(); }
     componentDidUpdate() {
-        if (this.props.source !== this.state.url) { this.refreshData('update'); }
+        if (this.props.source !== this.state.url || this.state.force !== this.props.force) { this.refreshData(); }
     }
 
     refreshData() {
@@ -124,15 +125,15 @@ class DataTable extends Component {
                     opts.status = status;
                     if (typeof this.props.preProcess === 'function') { resp = this.props.preProcess(resp, opts, this.props.source) }
                     let theCols = this.props.cols || (Array.isArray(resp) ? Object.keys(resp[0] || {}) : []);
-                    this.setState({ url: this.props.source, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols })
+                    this.setState({ url: this.props.source, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols, force: this.props.force })
                 })
-                .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure!!!' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
+                .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure!!!' + reps, sortKey: null, sortDir: null, force: this.props.force, theCols: this.props.cols || [] }));
         } else if (Array.isArray(this.props.source)) {
             let data = this.props.source;
             opts.status = 'connected.';
             if (typeof this.props.preProcess === 'function') { data = this.props.preProcess(data, opts, false) }
             let theCols = this.props.cols || Object.keys(this.props.source[0] || {});
-            this.setState({ url: data, theData: data, sortedData: data, status: 'connected.', sortKey: null, sortDir: null, theCols })
+            this.setState({ url: data, theData: data, sortedData: data, status: 'connected.', sortKey: null, sortDir: null, theCols, force: this.props.force })
         }
     }
 
