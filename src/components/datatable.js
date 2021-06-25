@@ -106,21 +106,32 @@ class DataTable extends Component {
         if (this.state.url && this.props.source !== this.state.url) { this.refreshData('update'); }///check logic!!!
     }
 
-    refreshData(a) {
+    refreshData() {
+        let opts = {
+            cols: this.props.cols,
+            linkMap: this.props.links,
+            labelMap: this.props.label,
+            typeMap: this.props.types,
+            sortMap: this.props.sortMap,
+            subMap: this.props.subMap,
+        }
+
         if (typeof this.props.source === 'string' || this.props.source instanceof String) {
             fetch(this.props.source)
                 .then(resp => resp.status === 200 ? resp.json() : null)
                 .then(resp => {
                     let status = resp ? 'connected.' : 'connection failure.';
-                    let theCols = this.props.cols || Object.keys(resp[0]);
-                    if (typeof this.props.preProcess === 'function') { resp = this.props.preProcess(resp, theCols, true) }
+                    opts.status = status;
+                    if (typeof this.props.preProcess === 'function') { resp = this.props.preProcess(resp, opts, this.props.source) }
+                    let theCols = this.props.cols || (Array.isArray(resp) ? Object.keys(resp[0] || {}) : []);
                     this.setState({ url: this.props.source, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols })
                 })
                 .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
         } else if (Array.isArray(this.props.source)) {
-            let theCols = this.props.cols || Object.keys(this.props.source[0]);
             let data = this.props.source;
-            if (typeof this.props.preProcess === 'function') { data = this.props.preProcess(data, theCols, false) }
+            opts.status = 'connected.';
+            if (typeof this.props.preProcess === 'function') { data = this.props.preProcess(data, opts, false) }
+            let theCols = this.props.cols || Object.keys(this.props.source[0] || {});
             this.setState({ url: data, theData: data, sortedData: data, status: 'connected.', sortKey: null, sortDir: null, theCols })
         }
     }
@@ -144,7 +155,7 @@ class DataTable extends Component {
                 />
             </table>
 
-        ) : (<div>{this.state.status}</div>);
+        ) : (<div className='data-table-fail'>{this.state.status}</div>);
     }
 
 }
