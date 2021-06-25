@@ -103,7 +103,7 @@ class DataTable extends Component {
 
     componentDidMount() { this.refreshData('mount'); }
     componentDidUpdate() {
-        if (this.state.url && this.props.source !== this.state.url) { this.refreshData('update'); }///check logic!!!
+        if (this.props.source !== this.state.url) { this.refreshData('update'); }
     }
 
     refreshData() {
@@ -126,7 +126,7 @@ class DataTable extends Component {
                     let theCols = this.props.cols || (Array.isArray(resp) ? Object.keys(resp[0] || {}) : []);
                     this.setState({ url: this.props.source, theData: resp, sortedData: resp, status, sortKey: null, sortDir: null, theCols })
                 })
-                .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
+                .catch(reps => this.setState({ url: null, theData: null, sortedData: null, status: 'script failure!!!' + reps, sortKey: null, sortDir: null, theCols: this.props.cols || [] }));
         } else if (Array.isArray(this.props.source)) {
             let data = this.props.source;
             opts.status = 'connected.';
