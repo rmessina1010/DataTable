@@ -51,7 +51,11 @@ export function DataTableBody(props) {
             let subs = props.subs[col] || {};
             return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} alt={null} />);
         });
-        let clickFoo = (foo, row, index, props) => typeof foo === 'function' ? () => foo(row, index, { ...props, rClick: null }) : null;
+        let clickFoo = (foo, row, index, props) => typeof foo === 'function' ?
+            (e) => {
+                if (!e.target.href) { foo(row, index, { ...props, rClick: null, reProcess: null }) }
+            }
+            : null;
         return (!props.undefRows && !isRowDefined) ? null :
             (<tr key={"row-" + rowKey} onClick={clickFoo(props.rClick, rowData, rIndex, props)}>{theCells}</tr>)
     })

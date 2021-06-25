@@ -8,8 +8,9 @@ function App() {
         descClass: 'sort-desc',
         tableAttrs: { className: 'sample-table' },
         sortMap: { GLIID: true, GLIOrd: true, QTY: true, Needed: true },
-        types: { image: 'img' },
-        rClick: (a) => alert(a.ItemName)
+        types: { image: 'img', a: 'html' },
+        rClick: (a) => alert(a.ItemName),
+        preProcess: (a) => { alert('preprocessor ran successfully'); return a; }
       }}
     />
   )

@@ -59,13 +59,12 @@ class MainComponent extends Component {
                 <Url
                     update={this.changeURL}
                     default={this.state.url}
-                    sample={[{ a: 1, c: 1 }, { b: 1, a: 0 }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
+                    sample={[{ a: 'text with <a href="http://apple.com" target="_blank">link</a>', c: 1 }, { b: 1, a: '0' }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
                 // refresh={() => this.setState(oldState => ({ ...oldState, force: !oldState.force }))}
                 />
                 <DataTable
                     source={this.state.source}
                     {...this.props.dataT}
-                //   preProcess={a => { alert('preprocessor ran successfully'); return a; }}
                 // force={this.state.force}
                 />
             </div>
