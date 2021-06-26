@@ -20,7 +20,7 @@ export function DTTD(props) {
         content = risk ? <a href={props.link} dangerouslySetInnerHTML={{ __html: risk }} /> : <a href={props.link}>{content}</a>;
         risk = null;
     }
-    return (risk ? <td key={'td-' + props.col + props.rowid} dangerouslySetInnerHTML={{ __html: risk }} /> : <td key={'td-' + props.col + props.rowid}>{content}</td>)
+    return (risk ? <td dangerouslySetInnerHTML={{ __html: risk }} /> : <td>{content}</td>)
 }
 
 export function DTTH(props) {
@@ -29,13 +29,9 @@ export function DTTH(props) {
 }
 
 export function DataTableHead({ cols, labelMap, sort }) {
-    let ths = cols.map(col => <DTTH title={(labelMap && labelMap[col]) ? labelMap[col] : col} sort={sort} />)
+    let ths = cols.map(col => { let key = (labelMap && labelMap[col]) ? labelMap[col] : col; return <DTTH title={key} sort={sort} key={key} /> })
     return (
-        <thead>
-
-            {ths.length > 0 ? (<tr>{ths} </tr>) : null}
-
-        </thead>
+        <thead>{ths.length > 0 ? (<tr>{ths} </tr>) : null}</thead>
     );
 }
 
@@ -49,7 +45,7 @@ export function DataTableBody(props) {
             let type = props.typeMap[col] || null;
             let link = props.linkMap[col] ? rowData[props.linkMap[col]] : null;
             let subs = props.subs[col] || {};
-            return (<DTTD data={rowData[col]} col={col} rowid={rowKey} type={type} link={link} subs={subs} alt={null} />);
+            return (<DTTD key={'td-' + col + rowKey} data={rowData[col]} col={col} type={type} link={link} subs={subs} alt={null} />);
         });
         let clickFoo = (foo, row, index, props) => typeof foo === 'function' ?
             (e) => {
