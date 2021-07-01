@@ -4,17 +4,19 @@ export function DTTD(props) {
     let risk = null;
     let content = null;
     if (props.col === undefined) { return null; }
-    let data = props.data;
     switch (props.type) {
         case 'img':
-            content = data ? <img src={data} alt={props.alt || ""} /> : null;
+            content = props.data ? <img src={props.data} alt={props.alt || ""} /> : null;
             break;
         case 'html':
             content = null;
-            risk = data;
+            risk = props.data;
+            break;
+        case 'raw':
+            content = props.data;
             break;
         default:
-            content = data?.toString();
+            content = props.data.toString();
     }
     if (props.link) {
         content = risk ? <a href={props.link} dangerouslySetInnerHTML={{ __html: risk }} /> : <a href={props.link}>{content}</a>;
