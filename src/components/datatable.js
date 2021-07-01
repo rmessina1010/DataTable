@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 export function DTTD(props) {
     let risk = null;
     let content = null;
-    let data = (props?.subs[props.data]) ? props.subs[props.data] : props.data;
     if (props.col === undefined) { return null; }
+    let data = props.data;
     switch (props.type) {
         case 'img':
             content = data ? <img src={data} alt={props.alt || ""} /> : null;
@@ -41,11 +41,12 @@ export function DataTableBody(props) {
         let isRowDefined = false;
         let rowKey = rowData[props.keycol] || rIndex;
         let theCells = props.cols.map(col => {
-            if (typeof rowData[col] !== 'undefined') { isRowDefined = true; }
+            let subs = props.subs[col] || null;
+            let data = (typeof props.rendCols?.[col] !== 'function') ? (subs ? subs?.[rowData[col]] : rowData[col]) : props.rendCols[col](rowData, col, subs);
+            if (typeof data !== 'undefined') { isRowDefined = true; }/// row is defined if at least ONE col is present
             let type = props.typeMap[col] || null;
             let link = props.linkMap[col] ? rowData[props.linkMap[col]] : null;
-            let subs = props.subs[col] || {};
-            return (<DTTD key={'td-' + col + rowKey} data={rowData[col]} col={col} type={type} link={link} subs={subs} alt={null} />);
+            return (<DTTD key={'td-' + col + rowKey} data={data} col={col} type={type} link={link} alt={null} />);
         });
         let clickFoo = (foo, row, index, props) => typeof foo === 'function' ?
             (e) => {
@@ -80,6 +81,7 @@ class DataTable extends Component {
         }
         this.clickToSort = this.clickToSort.bind(this);
         this.ordCol = null;
+
 
     }
 
@@ -153,6 +155,7 @@ class DataTable extends Component {
                     subs={this.state.subMap}
                     rClick={this.props.rClick}
                     undefRows={this.props.undefRows}
+                    rendCols={this.props.rendCols}
                 />
             </table>
 
