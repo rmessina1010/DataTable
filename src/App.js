@@ -7,11 +7,12 @@ function App() {
         ascClass: 'sort-asc',
         descClass: 'sort-desc',
         tableAttrs: { className: 'sample-table' },
+        links: { email: 'email', website: 'website' },
         sortMap: { GLIID: true, GLIOrd: true, QTY: true, Needed: true },
-        types: { image: 'img', a: 'html', email: "raw" },
+        types: { image: 'img', a: 'html' },
         rClick: (a) => alert(a.ItemName),
         preProcess: (a) => { alert('preprocessor ran successfully'); return a; },
-        rendCols: { address: (x, y) => x[y].city ? x[y].city : x[y], company: (x, y) => x[y].name ? x[y].name : x[y], email: (x, y) => <a href={"mailto:" + x[y]}>{x[y]}</a> }
+        rendCols: { address: (x, y) => x[y].city ? x[y].city : x[y], company: (x, y) => x[y].name ? x[y].name : x[y] }
       }}
     />
   )

@@ -19,7 +19,15 @@ export function DTTD(props) {
             content = props.data.toString();
     }
     if (props.link) {
-        content = risk ? <a href={props.link} dangerouslySetInnerHTML={{ __html: risk }} /> : <a href={props.link}>{content}</a>;
+        let theLink = props.link;
+        let anchorAttrs = {};
+        //attemps to figure out what kind of link it is (anchor, url, or email)
+        if (theLink.indexOf('http') !== 0 && theLink.indexOf('#') !== 0 && theLink.indexOf('mailto:') !== 0) {
+            theLink = (theLink.indexOf('@') > 0 ? 'mailto:' : 'http://') + theLink;
+        }
+        if (theLink.indexOf('http') === 0) { anchorAttrs.target = "_blank"; }
+        //
+        content = risk ? <a href={theLink} dangerouslySetInnerHTML={{ __html: risk }} {...anchorAttrs} /> : <a href={theLink} {...anchorAttrs} >{content}</a >;
         risk = null;
     }
     return (risk ? <td dangerouslySetInnerHTML={{ __html: risk }} /> : <td>{content}</td>)
