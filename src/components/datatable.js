@@ -25,7 +25,8 @@ export function DTTD(props) {
         if (theLink.indexOf('http') !== 0 && theLink.indexOf('#') !== 0 && theLink.indexOf('mailto:') !== 0) {
             theLink = (theLink.indexOf('@') > 0 ? 'mailto:' : 'http://') + theLink;
         }
-        if (theLink.indexOf('http') === 0) { anchorAttrs.target = "_blank"; }
+
+        if (theLink.indexOf('http') === 0 && window.location.hostname !== new URL(theLink).hostname) { anchorAttrs.target = "_blank"; }
         //
         content = risk ? <a href={theLink} dangerouslySetInnerHTML={{ __html: risk }} {...anchorAttrs} /> : <a href={theLink} {...anchorAttrs} >{content}</a >;
         risk = null;
