@@ -23,9 +23,9 @@ export function DTTD(props) {
         let anchorAttrs = {};
         //attemps to figure out what kind of link it is (anchor, url, or email)
         if (theLink.indexOf('http') !== 0 && theLink.indexOf('#') !== 0 && theLink.indexOf('mailto:') !== 0) {
-            theLink = (theLink.indexOf('@') > 0 ? 'mailto:' : 'http://') + theLink;
+            if (theLink.indexOf('.')) { theLink = (theLink.indexOf('@') > 0 ? 'mailto:' : 'http://') + theLink; }
+            else if (theLink.indexOf('/') < 0) { theLink = '#' + theLink; }
         }
-
         if (theLink.indexOf('http') === 0 && window.location.hostname !== new URL(theLink).hostname) { anchorAttrs.target = "_blank"; }
         //
         content = risk ? <a href={theLink} dangerouslySetInnerHTML={{ __html: risk }} {...anchorAttrs} /> : <a href={theLink} {...anchorAttrs} >{content}</a >;
@@ -92,8 +92,6 @@ class DataTable extends Component {
         }
         this.clickToSort = this.clickToSort.bind(this);
         this.ordCol = null;
-
-
     }
 
     clickToSort(e) {
