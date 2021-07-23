@@ -16,7 +16,7 @@ export function DTTD(props) {
             content = props.data;
             break;
         default:
-            content = props.data.toString();
+            content = props.data?.toString ? props.data.toString() : props.data;
     }
     if (props.link) {
         let theLink = props.link;

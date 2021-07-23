@@ -10,8 +10,8 @@ function App() {
         links: { email: 'email', website: 'website' },
         sortMap: { GLIID: true, GLIOrd: true, QTY: true, Needed: true },
         types: { image: 'img', a: 'html' },
-        rClick: (a) => alert(a.ItemName),
-        preProcess: (a) => { alert('preprocessor ran successfully'); return a; },
+        rClick: (a) => alert('click function:' + a.ItemName),
+        preProcess: (a) => { console.log('Preprocessor function ran successfully.'); return a; },
         rendCols: { address: (x, y) => x[y].city ? x[y].city : x[y], company: (x, y) => x[y].name ? x[y].name : x[y] }
       }}
     />
