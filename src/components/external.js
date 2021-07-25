@@ -23,13 +23,13 @@ export class Url extends Component {
     render() {
 
         return (
-            <div className="demo-ctrl">
-                <div>
+            <div className='demo-ctrl'>
+                <div className='url-group'>
                     <label>Enter Source URL: </label>
-                    <input name='sourceURL' id="sourceURL" value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
+                    <input name='sourceURL' placeholder='https://jsonplaceholder.typicode.com/users' id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
                 </div>
                 <div>
-                    <button onClick={() => this.update(this.props.sample)}>Or Use Sample Data</button>
+                    <button onClick={() => this.update(this.props.sample)}>Or Use Internal Sample Data</button>
                     {(typeof this.props.refresh === 'function') ? <button onClick={this.props.refresh}>Refresh</button> : null}
                 </div>
             </div >
@@ -55,7 +55,7 @@ class MainComponent extends Component {
 
     render() {
         return (
-            <div >
+            <div className="main-shell">
                 <Url
                     update={this.changeURL}
                     default={this.state.url}

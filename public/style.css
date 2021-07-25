@@ -28,5 +28,32 @@
 .demo-ctrl{
 	padding: .5em 1em;
 	text-align: center;
+	background: rgb(220, 247, 255);
+	border-radius: 4px;
+
 }
-.demo-ctrl div{ padding: .5em 0;}
+.demo-ctrl div{
+	padding: .5em 0;
+}
+
+.main-shell{
+	padding:1em;
+}
+
+.url-group{
+	display: flex;
+	width: 100%;
+	max-width: 840px;
+	margin: auto;
+ }
+ .url-group >label{
+	 padding: .5em;
+ }
+ .url-group >button{
+	 margin: .5em;
+ }
+ .url-group > input {
+	 flex: 1 1 auto;
+	 padding: .5em;
+ }
+
