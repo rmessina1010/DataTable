@@ -45,15 +45,23 @@
 	width: 100%;
 	max-width: 840px;
 	margin: auto;
+	align-items: center;
  }
  .url-group >label{
+	 padding: 0 .5em;
+   }
+
+ button.ctr-btn{
+	 margin:  .5em;
 	 padding: .5em;
+ 	 border-radius: 3px;
+	 border:1px solid #777;
+	 background: #ccc;
  }
- .url-group >button{
-	 margin: .5em;
- }
+
  .url-group > input {
 	 flex: 1 1 auto;
-	 padding: .5em;
+	 padding:  .5em;
+	 margin: 0;
  }
 

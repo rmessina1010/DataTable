@@ -27,9 +27,10 @@ export class Url extends Component {
                 <div className='url-group'>
                     <label>Enter Source URL: </label>
                     <input name='sourceURL' placeholder='https://jsonplaceholder.typicode.com/users' id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
+                    <button className='ctr-btn' onClick={() => this.update(this.state.url)}>Apply</button>
                 </div>
                 <div>
-                    <button onClick={() => this.update(this.props.sample)}>Or Use Internal Sample Data</button>
+                    <button className='ctr-btn' onClick={() => this.update(this.props.sample)}>Or Use Internal Sample Data</button>
                     {(typeof this.props.refresh === 'function') ? <button onClick={this.props.refresh}>Refresh</button> : null}
                 </div>
             </div >
