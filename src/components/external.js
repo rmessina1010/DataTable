@@ -21,13 +21,14 @@ export class Url extends Component {
     }
 
     render() {
-
+        const phURL = 'https://jsonplaceholder.typicode.com/users';
         return (
             <div className='demo-ctrl'>
                 <div className='url-group'>
                     <label>Enter Source URL: </label>
-                    <input name='sourceURL' placeholder='https://jsonplaceholder.typicode.com/users' id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
+                    <input name='sourceURL' placeholder={phURL} id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
                     <button className='ctr-btn' onClick={() => this.update(this.state.url)}>Apply</button>
+                    <button className='ctr-btn' onClick={() => this.setState({ url: this.state.url ? '' : phURL })}>{this.state.url ? 'Clear' : 'Default'}</button>
                 </div>
                 <div>
                     <button className='ctr-btn' onClick={() => this.update(this.props.sample)}>Or Use Internal Sample Data</button>
