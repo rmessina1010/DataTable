@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect, useState , useCallback} from 'react';
 import DataTable from './datatable';
+import DataTable2 from './datatable2';
 
 export class Url extends Component {
     constructor(props) {
@@ -69,9 +70,70 @@ class MainComponent extends Component {
                     {...this.props.dataT}
                 // force={this.state.force}
                 />
+                <DataTable2
+                    source={[
+                        {a:1, b:2, c:3, d:4, e:5},
+                        {a:2, b:2, c:4, d:4, e:5},
+                        {a:1, b:2, c:2, d:4, e:5},
+                        {a:3, b:2, c:5, d:4, e:5},
+                        {a:4, b:2, c:10, d:4, e:5},
+                        {a:5, b:2, c:7, d:4, e:5},
+                        {a:6, b:2, c:2, d:4, e:5}
+                    ]}
+                    schema={['a','d','c','e']}
+                    rowAction={ (d)=>alert(d.a)}
+                    renderSchemas={ { c: (d,k,i,r)=><a href={r.a}>{d}</a> ,}}
+                />
+
+                <FetchDataWrapper
+                    source={this.state.source}
+                    // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
+                    options={{
+                        renderSchemas:{
+                            image: i=> i && <img src={i} alt='' height="50"/>,
+                            website: i=><a href={i}>{i}</a>,
+                            email: i=><a href={i}>{i}</a>,
+                            address: x => x.city ,
+                            company: x => x.name
+
+                        },
+                        tableAttrs:{
+                            className: 'sample-table'
+                        },
+                        rowAction: a=>alert(a.image),
+                        skipEmpty: true
+                    }}
+                />
             </div>
         );
     }
 }
 
+export const FetchDataWrapper = ({source, schema, options})=>{
+    const [theData, setTheData] = useState([]);
+    const [stat, setStat] = useState('start');
+    const [theSchema, setTheSchema] = useState(Array.isArray(schema)? schema : []);
+
+    const refreshData = useCallback ( ()=>{
+        if (typeof source === 'string' || source instanceof String) {
+            fetch(source)
+                .then(resp => resp.status === 200 ? resp.json() : null)
+                .then(resp => {
+                    setStat(resp ? null: 'connection failure.');
+                    setTheData(resp);
+                    if (!Array.isArray(schema)){ setTheSchema(Object.keys(resp[0] || [])) }
+                })
+                .catch(reps => setTheData([]));
+        }else{
+            setTheData(Array.isArray(source) ? source : []);
+            if (!Array.isArray(schema)){ setTheSchema(Object.keys(source[0] || [])) }
+        }
+    }, [schema, source]);
+
+    useEffect(()=>{
+        refreshData(source);
+    }, [source, refreshData]);
+
+     return stat ||  <DataTable2 source={theData} schema={theSchema} {...options}/>
+}
 export default MainComponent;

@@ -1,0 +1,39 @@
+tbody tr:hover {
+    background: pink;
+}
+
+thead th:after {
+    content: "\00A0\00A0\00A0";
+    display: inline-block;
+}
+
+.active.up-arr:after {
+    display: inline-block;
+    font-size: 60%;
+    content: "\00A0\25B2";
+}
+
+.active.down-arr:after {
+    display: inline-block;
+    font-size: 60%;
+    content: "\00A0\25BC";
+}
+
+.active {
+    background: pink;
+}
+
+table {
+    border: 3px solid black;
+    border-collapse: collapse;
+    border-radius: 8px;
+}
+
+th {
+    background: #aaa;
+}
+
+td,th {
+    border: 1px solid;
+    padding: 6px;
+}
