@@ -5,8 +5,8 @@ function TCell({th, action, col, className, children}) {
     return (th ? <th onClick={doAction} className={className}>{children} </th> : <td className={className}>{children}</td>);
 }
 
-function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter, rowIndex, activeCol, skipClick, dirClass, skipEmpty }) {
- 	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas(data, rowIndex, activeCol, setter) : undefined;
+function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
+ 	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas(data, rowIndex, activeCol, setter, aux) : undefined;
 	let classes = '';
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
@@ -32,7 +32,7 @@ function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter,
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, source, skipClick, rowAction, tableAttrs, skipEmpty}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, source, skipClick, rowAction, tableAttrs, skipEmpty, aux={}}){
  	const [theData, setTheData]= useState(source);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);

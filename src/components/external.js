@@ -1,6 +1,6 @@
-import React, { Component, useEffect, useState , useCallback} from 'react';
-import DataTable from './datatable';
+import React, { Component, useEffect, useState , useCallback } from 'react';
 import DataTable2 from './datatable2';
+import DataTable from './datatable';
 
 export class Url extends Component {
     constructor(props) {
@@ -53,7 +53,7 @@ class MainComponent extends Component {
     }
 
     changeURL(newURL) {
-        this.setState({ source: newURL })
+        this.setState({ ...this.state, source: newURL  })
     }
 
     render() {
@@ -70,6 +70,24 @@ class MainComponent extends Component {
                     {...this.props.dataT}
                 // force={this.state.force}
                 />
+                <FetchDataWrapper
+                    source={this.state.source}
+                    // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
+                    options={{
+                        renderSchemas:{
+                            image: i=> i && <img src={i} alt='' height="50"/>,
+                            website: i=><a href={i}>{i}</a>,
+                            email: i=><a href={i}>{i}</a>,
+                            address:  this.props.dataT.rendCols.address,
+                            company: this.props.dataT.rendCols.company
+
+                        },
+                        tableAttrs: this.props.dataT.tableAttrs,
+                        rowAction: this.state.source.indexOf('sharelist')<0 ? (a,b, c)=>alert(a.image || a.email) : this.props.dataT.rClick ,
+                        skipEmpty: true
+                    }}
+                />
+
                 <DataTable2
                     source={[
                         {a:1, b:2, c:3, d:4, e:5},
@@ -84,26 +102,6 @@ class MainComponent extends Component {
                     rowAction={ (d)=>alert(d.a)}
                     renderSchemas={ { c: (d,k,i,r)=><a href={r.a}>{d}</a> ,}}
                 />
-
-                <FetchDataWrapper
-                    source={this.state.source}
-                    // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
-                    options={{
-                        renderSchemas:{
-                            image: i=> i && <img src={i} alt='' height="50"/>,
-                            website: i=><a href={i}>{i}</a>,
-                            email: i=><a href={i}>{i}</a>,
-                            address: x => x.city ,
-                            company: x => x.name
-
-                        },
-                        tableAttrs:{
-                            className: 'sample-table'
-                        },
-                        rowAction: a=>alert(a.image),
-                        skipEmpty: true
-                    }}
-                />
             </div>
         );
     }
@@ -114,9 +112,9 @@ export const FetchDataWrapper = ({source, schema, options})=>{
     const [stat, setStat] = useState('start');
     const [theSchema, setTheSchema] = useState(Array.isArray(schema)? schema : []);
 
-    const refreshData = useCallback ( ()=>{
+    const refreshData = useCallback ( (signal)=>{
         if (typeof source === 'string' || source instanceof String) {
-            fetch(source)
+            fetch(source, { signal })
                 .then(resp => resp.status === 200 ? resp.json() : null)
                 .then(resp => {
                     setStat(resp ? null: 'connection failure.');
@@ -131,7 +129,9 @@ export const FetchDataWrapper = ({source, schema, options})=>{
     }, [schema, source]);
 
     useEffect(()=>{
-        refreshData(source);
+        const  controller = new AbortController();
+        refreshData( controller.signal);
+        return ()=> controller.abort();
     }, [source, refreshData]);
 
      return stat ||  <DataTable2 source={theData} schema={theSchema} {...options}/>
