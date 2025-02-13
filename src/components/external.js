@@ -1,6 +1,5 @@
 import React, { Component, useEffect, useState , useCallback } from 'react';
 import DataTable2 from './datatable2';
-import DataTable from './datatable';
 
 export class Url extends Component {
     constructor(props) {
@@ -64,11 +63,6 @@ class MainComponent extends Component {
                     default={this.state.url}
                     sample={[{ a: 'text with <a href="http://apple.com" target="_blank">link</a>', c: 1 }, { b: 1, a: '0' }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
                 // refresh={() => this.setState(oldState => ({ ...oldState, force: !oldState.force }))}
-                />
-                <DataTable
-                    source={this.state.source}
-                    {...this.props.dataT}
-                // force={this.state.force}
                 />
                 <FetchDataWrapper
                     source={this.state.source}
