@@ -32,7 +32,7 @@ function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter,
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, source, skipClick, rowAction, tableAttrs, skipEmpty, aux={}}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, source, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}}){
  	const [theData, setTheData]= useState(source);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
@@ -40,13 +40,15 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, so
 	useEffect(() => {setTheData(source);}, [source]);
 
  	const triggerSort=(col)=>{
+			const getVal = typeof sortSchemas === 'function' ? sortSchemas :
+			typeof sortSchemas?.[col] === 'function' ? sortSchemas[col] : v => v;
 		    let ori = dir;
 			if (col !== sortKey) {
 				setSortKey(col);
 				ori = 1;
 			}
  			const sortedData = [...theData].sort((a, b) => {
-				return a[col] <= b[col] ?  -1 * ori : ori ;
+				return getVal(a[col]) <= getVal(b[col]) ?  -1 * ori : ori ;
 			});
 			setTheData(sortedData);
 			setDir(ori * -1);

@@ -76,6 +76,7 @@ class MainComponent extends Component {
                             company: this.props.dataT.rendCols.company
 
                         },
+                        sortSchemas: this.props.dataT.sortSchemas,
                         tableAttrs: this.props.dataT.tableAttrs,
                         rowAction: this.state.source.indexOf('sharelist')<0 ? (a,b, c)=>alert(a.image || a.email) : this.props.dataT.rClick ,
                         skipEmpty: true

@@ -9,6 +9,10 @@ function App() {
         rendCols: {
           address: x => x.city ,
           company: x => x.name
+        },
+        sortSchemas: {
+          address: x => x.city ,
+          company: x => x.name
         }
       }}
     />
