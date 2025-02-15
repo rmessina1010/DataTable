@@ -5,7 +5,7 @@ function App() {
       url='https://sharelist.raymessinadesign.com/service.php'
       dataT={{
         tableAttrs: { className: 'sample-table' },
-        rClick: (a) => alert('click function [ItemName]:' + a.ItemName),
+        rClick: ({data, rowIndex}) => alert('click function [ItemName]:' + data[rowIndex].ItemName),
         rendCols: {
           address: x => x.city ,
           company: x => x.name

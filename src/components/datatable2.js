@@ -6,17 +6,17 @@ function TCell({th, action, col, className, children}) {
 }
 
 function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
- 	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas(data, rowIndex, activeCol, setter, aux) : undefined;
+ 	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas({data, rowIndex, activeCol, setter, aux}) : undefined;
 	let classes = '';
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
-	if (skipEmpty){
-		if ( !Object.keys(data)?.length || (schema.filter(s => data[s] !== undefined).length === 0)) {return null}
+	if (!isHead && skipEmpty){
+		if ( !Object.keys(data[rowIndex])?.length || (schema.filter(s => data[rowIndex][s] !== undefined).length === 0)) {return null}
 	}
     const cells = schema.map( c =>{
 		const clickSchema = (isHead && typeof clickSchemas === 'function' && !noClick.includes(c)) ? clickSchemas : undefined;
 		classes = (isHead && c === activeCol) ? ` ${dirClass}` : '';
-		const content = isHead ? c : data[c];
+		const content = isHead ? c : data[rowIndex][c];
 		const renderSchema = typeof renderSchemas === 'function' ? renderSchemas :
 					(typeof renderSchemas?.[c] === 'function' ? renderSchemas[c] : undefined);
 		return ( <TCell
@@ -69,7 +69,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 				<tbody>{theData.map( (row,i) => {
 					return <TRow
 						key={`key_${ (keyCol in row) ? JSON.stringify(row[keyCol]) : i}`}
-						data={row}
+						data={theData}
 						schema={schema}
 						renderSchemas={renderSchemas}
 						clickSchemas={rowAction}

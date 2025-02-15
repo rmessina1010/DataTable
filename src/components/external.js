@@ -78,7 +78,7 @@ class MainComponent extends Component {
                         },
                         sortSchemas: this.props.dataT.sortSchemas,
                         tableAttrs: this.props.dataT.tableAttrs,
-                        rowAction: this.state.source.indexOf('sharelist')<0 ? (a,b, c)=>alert(a.image || a.email) : this.props.dataT.rClick ,
+                        rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex})=>alert(data[rowIndex].image || data[rowIndex].email) : this.props.dataT.rClick ,
                         skipEmpty: true
                     }}
                 />
@@ -94,7 +94,7 @@ class MainComponent extends Component {
                         {a:6, b:2, c:2, d:4, e:5}
                     ]}
                     schema={['a','d','c','e']}
-                    rowAction={ (d)=>alert(d.a)}
+                    rowAction={ ({data, rowIndex})=>alert(data[rowIndex].a)}
                     renderSchemas={ { c: (d,k,i,r)=><a href={r.a}>{d}</a> ,}}
                 />
             </div>
