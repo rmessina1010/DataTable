@@ -84,7 +84,7 @@ class MainComponent extends Component {
                 />
 
                 <DataTable2
-                    source={[
+                    data={[
                         {a:1, b:2, c:3, d:4, e:5},
                         {a:2, b:2, c:4, d:4, e:5},
                         {a:1, b:2, c:2, d:4, e:5},
@@ -129,6 +129,6 @@ export const FetchDataWrapper = ({source, schema, options})=>{
         return ()=> controller.abort();
     }, [source, refreshData]);
 
-     return stat ||  <DataTable2 source={theData} schema={theSchema} {...options}/>
+     return stat ||  <DataTable2 data={theData} schema={theSchema} {...options}/>
 }
 export default MainComponent;
