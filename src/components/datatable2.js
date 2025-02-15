@@ -1,12 +1,15 @@
-import { useState , useEffect} from "react";
+import { useState , useEffect, createContext, useContext} from "react";
+
+const TableContext = createContext();
 
 function TCell({th, action, col, className, children}) {
 	const doAction= th && typeof action === 'function' ? ()=>action(col) : undefined;
     return (th ? <th onClick={doAction} className={className}>{children} </th> : <td className={className}>{children}</td>);
 }
 
-function TRow({ data, schema, clickSchemas, renderSchemas, isHead=false, setter, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
- 	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas({data, rowIndex, activeCol, setter, aux}) : undefined;
+function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
+ 	const { schema, theData:data, setTheData:setter} = useContext (TableContext);
+	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas({data, rowIndex, activeCol, setter, aux}) : undefined;
 	let classes = '';
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
@@ -54,10 +57,10 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 			setDir(ori * -1);
 		};
 
-    return (<table {...tableAttrs}>
+    return (<TableContext.Provider value={{ theData, setTheData, schema}}>
+		<table {...tableAttrs}>
 				<thead>
 					<TRow
-						schema={schema}
 						renderSchemas={headRenderSchemas}
 						isHead={true}
 						clickSchemas={triggerSort}
@@ -69,14 +72,13 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 				<tbody>{theData.map( (row,i) => {
 					return <TRow
 						key={`key_${ (keyCol in row) ? JSON.stringify(row[keyCol]) : i}`}
-						data={theData}
-						schema={schema}
 						renderSchemas={renderSchemas}
 						clickSchemas={rowAction}
 						rowIndex={i}
 						skipEmpty={skipEmpty}
 				/>})}</tbody>
-			</table>);
+			</table>
+		</TableContext.Provider>);
 }
 
 export default DataTable2;
