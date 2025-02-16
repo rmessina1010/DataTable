@@ -9,7 +9,7 @@ function TCell({th, action, col, className, children}) {
 
 function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
  	const { schema, theData:data, setTheData:setter} = useContext (TableContext);
-	const doAction= !isHead && typeof clickSchemas === 'function' ? ()=>clickSchemas({data, rowIndex, activeCol, setter, aux}) : undefined;
+	const doAction= !isHead && typeof clickSchemas === 'function' ? (e)=>clickSchemas({e, data, rowIndex, activeCol, setter, aux}) : undefined;
 	let classes = '';
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
@@ -35,16 +35,24 @@ function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, s
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas}){
  	const [theData, setTheData]= useState(data);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
 
 	useEffect(() => {setTheData(data);}, [data]);
 
+	const valFinderFoo = (col)=>{
+		if (typeof sortSchemas === 'function')  {return sortSchemas ;}
+		if (typeof sortSchemas?.[col] === 'function')  return( sortSchemas[col])
+		return v => v;
+	}
+
+	const filteredData = () => (typeof filterSchemas?.foo !== 'function') ? theData
+			: theData.reduce( (a, row, i) => { if(filterSchemas.foo( row, filterSchemas.col, filterSchemas.invert, valFinderFoo)){ a[i]=row} return a}, []);
+
  	const triggerSort=(col)=>{
-			const getVal = typeof sortSchemas === 'function' ? sortSchemas :
-			typeof sortSchemas?.[col] === 'function' ? sortSchemas[col] : v => v;
+			const getVal = valFinderFoo(col);
 		    let ori = dir;
 			if (col !== sortKey) {
 				setSortKey(col);
@@ -69,7 +77,8 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 						dirClass={dir>0 ?  'active down-arr' : 'active up-arr'}
 					/>
 				</thead>
-				<tbody>{theData.map( (row,i) => {
+				<tbody>{
+					filteredData().map( (row,i) => {
 					return <TRow
 						key={`key_${ (keyCol in row) ? JSON.stringify(row[keyCol]) : i}`}
 						renderSchemas={renderSchemas}

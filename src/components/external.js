@@ -71,15 +71,22 @@ class MainComponent extends Component {
                         renderSchemas:{
                             image: i=> i && <img src={i} alt='' height="50"/>,
                             website: i=><a href={i}>{i}</a>,
-                            email: i=><a href={i}>{i}</a>,
+                            email: i=><a href={`mailto:${i}`}>{i}</a>,
                             address:  this.props.dataT.rendCols.address,
                             company: this.props.dataT.rendCols.company
 
                         },
                         sortSchemas: this.props.dataT.sortSchemas,
                         tableAttrs: this.props.dataT.tableAttrs,
-                        rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex})=>alert(data[rowIndex].image || data[rowIndex].email) : this.props.dataT.rClick ,
-                        skipEmpty: true
+                        rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>alert(e.target) : this.props.dataT.rClick ,
+                        skipEmpty: true,
+                        filterSchemas:{
+                            foo: (row,x,y,foo)=>{
+                                const findMe= foo('company')
+                                if (row.company === undefined) {return true}
+                                return (findMe(row.company).indexOf('-') > 0 );
+                            }
+                        }
                     }}
                 />
 
