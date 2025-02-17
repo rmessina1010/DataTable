@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState , useCallback } from 'react';
+import React, { Component, useEffect, useState , useCallback, useRef } from 'react';
 import DataTable2 from './datatable2';
 
 export class Url extends Component {
@@ -39,6 +39,22 @@ export class Url extends Component {
     }
 }
 
+const Filter = ({changeFilt, cols})=>{
+    const needleVal = useRef()
+    const colVal = useRef()
+    const invert = useRef()
+    return (<div>
+        <label>Column: </label>
+        <select ref={colVal}>
+            {cols.map(col=><option value={col}>{col}</option>)}
+        </select>
+        <input  ref={needleVal}/>
+        <button onClick={ ()=>changeFilt({col:colVal.current.value, needle: needleVal.current.value, invert: invert.current.checked}) }>Filter</button>
+        <label> <input type="checkbox" ref={invert}/> Invert </label>
+
+    </div>)
+}
+
 class MainComponent extends Component {
     constructor(props) {
         super(props);
@@ -46,13 +62,21 @@ class MainComponent extends Component {
             url: this.props.url,
             t: 15,
             source: this.props.url,
-            force: false
+            force: false,
+            filter: {
+                col:'company',
+                needle:'-',
+                invert: false
+            }
         }
         this.changeURL = this.changeURL.bind(this);
     }
 
     changeURL(newURL) {
         this.setState({ ...this.state, source: newURL  })
+    }
+    changeFilter(newFilter) {
+        this.setState({ ...this.state, filter: newFilter  })
     }
 
     render() {
@@ -64,8 +88,10 @@ class MainComponent extends Component {
                     sample={[{ a: 'text with <a href="http://apple.com" target="_blank">link</a>', c: 1 }, { b: 1, a: '0' }, { a: 2 }, { a: 4, c: 0 }, { a: 4, c: 0 }, { a: 4, c: 4 }, { b: 0 }, {}, {}, {}]}
                 // refresh={() => this.setState(oldState => ({ ...oldState, force: !oldState.force }))}
                 />
+
                 <FetchDataWrapper
                     source={this.state.source}
+                    setFilt = {this.changeFilter.bind(this)}
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
                         renderSchemas:{
@@ -81,14 +107,19 @@ class MainComponent extends Component {
                         rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>alert(e.target) : this.props.dataT.rClick ,
                         skipEmpty: true,
                         filterSchemas:{
-                            foo: (row,x,y,foo)=>{
-                                const findMe= foo('company')
-                                if (row.company === undefined) {return true}
-                                return (findMe(row.company).indexOf('-') > 0 );
+                            col: this.state.filter.col,
+                            needle: this.state.filter.needle,
+                            invert: this.state.filter.invert,
+                            foo: (row,col,inv,makeFind,needle)=>{
+                                const findMe= makeFind(col);
+                                if (row[col]=== undefined) {return true}
+                                const result = (findMe(row[col]).toString().indexOf(needle) > -1);
+                                return  inv ? !result : result;
                             }
-                        }
+                        },
                     }}
-                />
+                >
+                </FetchDataWrapper>
 
                 <DataTable2
                     data={[
@@ -109,7 +140,7 @@ class MainComponent extends Component {
     }
 }
 
-export const FetchDataWrapper = ({source, schema, options})=>{
+export const FetchDataWrapper = ({source, schema, options, setFilt})=>{
     const [theData, setTheData] = useState([]);
     const [stat, setStat] = useState('start');
     const [theSchema, setTheSchema] = useState(Array.isArray(schema)? schema : []);
@@ -136,6 +167,6 @@ export const FetchDataWrapper = ({source, schema, options})=>{
         return ()=> controller.abort();
     }, [source, refreshData]);
 
-     return stat ||  <DataTable2 data={theData} schema={theSchema} {...options}/>
+     return stat || <><Filter cols={Object.keys(theData[0] || {})} changeFilt={setFilt}/> <DataTable2 data={theData} schema={theSchema} {...options}/></>
 }
 export default MainComponent;

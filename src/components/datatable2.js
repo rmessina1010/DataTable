@@ -48,8 +48,8 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 		return v => v;
 	}
 
-	const filteredData = () => (typeof filterSchemas?.foo !== 'function') ? theData
-			: theData.reduce( (a, row, i) => { if(filterSchemas.foo( row, filterSchemas.col, filterSchemas.invert, valFinderFoo)){ a[i]=row} return a}, []);
+	const filteredData = () => (typeof filterSchemas?.foo !== 'function' || filterSchemas.needle === '') ? theData
+			: theData.reduce( (a, row, i) => { if( filterSchemas.foo( row, filterSchemas.col, filterSchemas.invert, valFinderFoo, filterSchemas.needle)){ a[i]=row} return a}, []);
 
  	const triggerSort=(col)=>{
 			const getVal = valFinderFoo(col);
