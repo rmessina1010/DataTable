@@ -91,7 +91,7 @@ class MainComponent extends Component {
 
                 <FetchDataWrapper
                     source={this.state.source}
-                    setFilt = {this.changeFilter.bind(this)}
+                    setFilt = {false} // {this.changeFilter.bind(this)}
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
                         renderSchemas:{
@@ -104,7 +104,7 @@ class MainComponent extends Component {
                         },
                         sortSchemas: this.props.dataT.sortSchemas,
                         tableAttrs: this.props.dataT.tableAttrs,
-                        rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>alert(e.target) : this.props.dataT.rClick ,
+                        rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>{alert(e.currentTarget)} : this.props.dataT.rClick ,
                         skipEmpty: true,
                         filterSchemas:{
                             col: this.state.filter.col,
@@ -167,6 +167,10 @@ export const FetchDataWrapper = ({source, schema, options, setFilt})=>{
         return ()=> controller.abort();
     }, [source, refreshData]);
 
-     return stat || <><Filter cols={Object.keys(theData[0] || {})} changeFilt={setFilt}/> <DataTable2 data={theData} schema={theSchema} {...options}/></>
+     return stat ||
+        <>
+            { typeof setFilt === 'function' ? <Filter cols={Object.keys(theData[0] || {})} changeFilt={setFilt}/> : null }
+            <DataTable2 data={theData} schema={theSchema} {...options}/>
+        </>
 }
 export default MainComponent;
