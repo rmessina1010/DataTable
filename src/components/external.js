@@ -43,7 +43,7 @@ const Filter = ({changeFilt, cols})=>{
     const needleVal = useRef()
     const colVal = useRef()
     const invert = useRef()
-    return (<div>
+    return (<div className='demo-ctrl'>
         <label>Column: </label>
         <select ref={colVal}>
             {cols.map(col=><option value={col}>{col}</option>)}
@@ -64,8 +64,8 @@ class MainComponent extends Component {
             source: this.props.url,
             force: false,
             filter: {
-                col:'company',
-                needle:'-',
+                col:'',
+                needle:'',
                 invert: false
             }
         }
@@ -91,7 +91,7 @@ class MainComponent extends Component {
 
                 <FetchDataWrapper
                     source={this.state.source}
-                    setFilt = {false} // {this.changeFilter.bind(this)}
+                    // setFilt = {this.changeFilter.bind(this)}
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
                         renderSchemas:{
@@ -167,10 +167,11 @@ export const FetchDataWrapper = ({source, schema, options, setFilt})=>{
         return ()=> controller.abort();
     }, [source, refreshData]);
 
-     return stat ||
+    const cleanOptions = typeof setFilt === 'function' ? options : {...options, filterSchemas:null};
+    return stat ||
         <>
             { typeof setFilt === 'function' ? <Filter cols={Object.keys(theData[0] || {})} changeFilt={setFilt}/> : null }
-            <DataTable2 data={theData} schema={theSchema} {...options}/>
+            <DataTable2 data={theData} schema={theSchema} {...cleanOptions}/>
         </>
 }
 export default MainComponent;
