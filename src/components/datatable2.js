@@ -7,9 +7,9 @@ function TCell({th, action, col, className, children}) {
     return (th ? <th onClick={doAction} className={className}>{children} </th> : <td className={className}>{children}</td>);
 }
 
-function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
+function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
  	const { schema, theData:data, setTheData:setter} = useContext (TableContext);
-	const doAction= !isHead && typeof clickSchemas === 'function' ? (e)=>clickSchemas({e, data, rowIndex, activeCol, setter, aux}) : undefined;
+	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, data, rowIndex, activeCol, setter, aux}) : undefined;
 	let classes = '';
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
@@ -17,7 +17,7 @@ function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, s
 		if ( !Object.keys(data[rowIndex])?.length || (schema.filter(s => data[rowIndex][s] !== undefined).length === 0)) {return null}
 	}
     const cells = schema.map( c =>{
-		const clickSchema = (isHead && typeof clickSchemas === 'function' && !noClick.includes(c)) ? clickSchemas : undefined;
+		const rowClick = (isHead && typeof rowClicks === 'function' && !noClick.includes(c)) ? rowClicks : undefined;
 		classes = (isHead && c === activeCol) ? ` ${dirClass}` : '';
 		const content = isHead ? c : data[rowIndex][c];
 		const renderSchema = typeof renderSchemas === 'function' ? renderSchemas :
@@ -25,7 +25,7 @@ function TRow({clickSchemas, renderSchemas, isHead=false, rowIndex, activeCol, s
 		return ( <TCell
 				th= {isHead}
 				key= {`${kprefix}_${c}`}
-				action= {clickSchema}
+				action= {rowClick}
 				className= {classes}
 				col={c}
 			>
@@ -71,7 +71,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 					<TRow
 						renderSchemas={headRenderSchemas}
 						isHead={true}
-						clickSchemas={triggerSort}
+						rowClicks={triggerSort}
 						skipClick={skipClick}
 						activeCol={sortKey}
 						dirClass={dir>0 ?  'active down-arr' : 'active up-arr'}
@@ -82,7 +82,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 					return <TRow
 						key={`key_${ (keyCol in row) ? JSON.stringify(row[keyCol]) : i}`}
 						renderSchemas={renderSchemas}
-						clickSchemas={rowAction}
+						rowClicks={rowAction}
 						rowIndex={i}
 						skipEmpty={skipEmpty}
 				/>})}</tbody>
