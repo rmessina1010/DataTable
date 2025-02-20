@@ -2,8 +2,8 @@ import { useState , useEffect, createContext, useContext} from "react";
 
 const TableContext = createContext();
 
-function TCell({th, action, col, className, children}) {
-	const { theData:data , setTheData:setter, index, aux, activeCol, findfoos} = useContext (TableContext);
+function TCell({th, action, col, className, children, activeCol}) {
+	const { theData:data , setTheData:setter, index, aux, findfoos} = useContext (TableContext);
 	const Tag = th ? 'th' : 'td';
 	const attributes =  {className};
 	const doAction = Array.isArray(action) ? action[0] : action;
@@ -17,8 +17,8 @@ function TCell({th, action, col, className, children}) {
     return <Tag {...attributes}>{children} </Tag>;
 }
 
-function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  }){
- 	const { schema, theData:data, setTheData:setter, aux, cellClicks, findfoos, activeCol } = useContext (TableContext);
+function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  activeCol}){
+ 	const { schema, theData:data, setTheData:setter, aux, cellClicks, findfoos } = useContext (TableContext);
 	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, content:data[rowIndex], data, rowIndex, activeCol, setter, aux, findfoos}) : undefined;
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
@@ -39,6 +39,7 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirC
 				action= {cellClick}
 				className= {classes}
 				col={c}
+				activeCol={activeCol}
 			>
 		 		{ renderSchema ? renderSchema(content, c, rowIndex, data ) : content }
 			</TCell>);
