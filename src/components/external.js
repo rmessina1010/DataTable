@@ -103,6 +103,9 @@ class MainComponent extends Component {
 
                         },
                         sortSchemas: this.props.dataT.sortSchemas,
+                        clickSchemas:{
+                            email: x=>alert(x)
+                        },
                         tableAttrs: this.props.dataT.tableAttrs,
                         rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>{alert(e.currentTarget)} : this.props.dataT.rClick ,
                         skipEmpty: true,

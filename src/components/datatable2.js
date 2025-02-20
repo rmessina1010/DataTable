@@ -3,29 +3,40 @@ import { useState , useEffect, createContext, useContext} from "react";
 const TableContext = createContext();
 
 function TCell({th, action, col, className, children}) {
-	const doAction= th && typeof action === 'function' ? ()=>action(col) : undefined;
-    return (th ? <th onClick={doAction} className={className}>{children} </th> : <td className={className}>{children}</td>);
+	const { theData:data , setTheData:setter, index, aux, activeCol, findfoos} = useContext (TableContext);
+	const Tag = th ? 'th' : 'td';
+	const attributes =  {className};
+	const doAction = Array.isArray(action) ? action[0] : action;
+	const bubble   = Array.isArray(action) ? action[1] : undefined;
+	if(typeof doAction === 'function') {
+			attributes.onClick = !th ? e =>{
+				if (!bubble) { e.stopPropagation(); }
+				doAction({e, content: data[index][col], data, col, rowIndex:index, setter, aux, activeCol, findfoos });
+			} : attributes.onClick=()=>doAction(col);
+	}
+    return <Tag {...attributes}>{children} </Tag>;
 }
 
-function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, activeCol, skipClick, dirClass, skipEmpty, aux={} }) {
- 	const { schema, theData:data, setTheData:setter} = useContext (TableContext);
-	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, data, rowIndex, activeCol, setter, aux}) : undefined;
-	let classes = '';
+function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  }){
+ 	const { schema, theData:data, setTheData:setter, aux, cellClicks, findfoos, activeCol } = useContext (TableContext);
+	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, content:data[rowIndex], data, rowIndex, activeCol, setter, aux, findfoos}) : undefined;
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
 	if (!isHead && skipEmpty){
 		if ( !Object.keys(data[rowIndex])?.length || (schema.filter(s => data[rowIndex][s] !== undefined).length === 0)) {return null}
 	}
     const cells = schema.map( c =>{
-		const rowClick = (isHead && typeof rowClicks === 'function' && !noClick.includes(c)) ? rowClicks : undefined;
-		classes = (isHead && c === activeCol) ? ` ${dirClass}` : '';
+		const cellClick = (isHead && !noClick.includes(c)) ? rowClicks
+						  :(!isHead && (typeof cellClicks?.[c] === 'function' || Array.isArray(cellClicks?.[c]))) ? cellClicks[c]
+						  :undefined;
+		const classes = (isHead && c === activeCol) ? ` ${dirClass}` : '';
 		const content = isHead ? c : data[rowIndex][c];
 		const renderSchema = typeof renderSchemas === 'function' ? renderSchemas :
 					(typeof renderSchemas?.[c] === 'function' ? renderSchemas[c] : undefined);
 		return ( <TCell
 				th= {isHead}
 				key= {`${kprefix}_${c}`}
-				action= {rowClick}
+				action= {cellClick}
 				className= {classes}
 				col={c}
 			>
@@ -35,7 +46,7 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, activeCol, skip
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas}){
  	const [theData, setTheData]= useState(data);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
@@ -65,7 +76,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 			setDir(ori * -1);
 		};
 
-    return (<TableContext.Provider value={{ theData, setTheData, schema}}>
+    return (<TableContext.Provider value={{ theData, setter:setTheData, schema, sortKey, aux}}>
 		<table {...tableAttrs}>
 				<thead>
 					<TRow
@@ -83,6 +94,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 						key={`key_${ (keyCol in row) ? JSON.stringify(row[keyCol]) : i}`}
 						renderSchemas={renderSchemas}
 						rowClicks={rowAction}
+						cellClicks = {clickSchemas}
 						rowIndex={i}
 						skipEmpty={skipEmpty}
 				/>})}</tbody>
