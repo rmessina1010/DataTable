@@ -91,7 +91,7 @@ class MainComponent extends Component {
 
                 <FetchDataWrapper
                     source={this.state.source}
-                    // setFilt = {this.changeFilter.bind(this)}
+                    setFilt = {this.changeFilter.bind(this)}
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
                         renderSchemas:{
@@ -104,7 +104,7 @@ class MainComponent extends Component {
                         },
                         sortSchemas: this.props.dataT.sortSchemas,
                         clickSchemas:{
-                            email: x=>alert(x)
+                            phone: ({content})=>alert(JSON.stringify(content))
                         },
                         tableAttrs: this.props.dataT.tableAttrs,
                         rowAction: this.state.source.indexOf('sharelist')<0 ? ({data,rowIndex,e})=>{alert(e.currentTarget)} : this.props.dataT.rClick ,
@@ -134,9 +134,17 @@ class MainComponent extends Component {
                         {a:5, b:2, c:7, d:4, e:5},
                         {a:6, b:2, c:2, d:4, e:5}
                     ]}
-                    schema={['a','d','c','e']}
+                    schema={['a','d','c','e','remove']}
                     rowAction={ ({data, rowIndex})=>alert(data[rowIndex].a)}
-                    renderSchemas={ { c: (d,k,i,r)=><a href={r.a}>{d}</a> ,}}
+                    renderSchemas={ {
+                        c: (d,k,i,r)=><a href={r.a}>{d}</a> ,
+                        remove:(d,k,i,r,s)=>{ return <button onClick={(e)=>{ e.stopPropagation(); s(r.filter((v,ki)=> ki!==i))}}>{k} {i}</button> }
+                    }}
+                    clickSchemas ={{
+                            c: ({content})=>alert(JSON.stringify(content)),
+                            // remove:({rowIndex,setter})=> {alert(setter);}
+                     } }
+
                 />
             </div>
         );
