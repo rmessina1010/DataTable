@@ -3,7 +3,7 @@ import { useState , useEffect, createContext, useContext} from "react";
 const TableContext = createContext({setter:()=>2});
 
 function TCell({th, action, col, className, children, activeCol, rowIndex}) {
-	const { theData:data  , aux, sortSchemas, setter} = useContext (TableContext);
+	const { theData:data  , aux, sortSchemas, setter, extSetter} = useContext (TableContext);
 	const Tag = th ? 'th' : 'td';
 	const attributes =  {className};
 	const doAction = Array.isArray(action) ? action[0] : action;
@@ -11,15 +11,15 @@ function TCell({th, action, col, className, children, activeCol, rowIndex}) {
 	if(typeof doAction === 'function') {
 			attributes.onClick = !th ? e =>{
 				if (!bubble) { e.stopPropagation(); }
-				doAction({e, content: data[rowIndex][col], data, col, rowIndex, setter, aux, activeCol, sortSchemas });
+				doAction({e, content: data[rowIndex][col], data, col, rowIndex, setter, aux, activeCol, sortSchemas, extSetter});
 			} : attributes.onClick=()=>doAction(col);
 	}
     return <Tag {...attributes}>{children} </Tag>;
 }
 
 function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  activeCol}){
- 	const { schema, theData:data, setter, aux, cellClicks, sortSchemas } = useContext (TableContext);
-	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, content:data[rowIndex], data, rowIndex, activeCol, setter, aux, sortSchemas}) : undefined;
+ 	const { schema, theData:data, setter, aux, cellClicks, sortSchemas, extSetter} = useContext (TableContext);
+	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, content:data[rowIndex], data, rowIndex, activeCol, setter, aux, sortSchemas, extSetter}) : undefined;
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
 	if (!isHead && skipEmpty){
@@ -42,13 +42,13 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirC
 				activeCol= {activeCol}
 				rowIndex = {rowIndex }
 			>
-		 		{ renderSchema ? renderSchema(content, c, rowIndex, data, setter) : content }
+		 		{ renderSchema ? renderSchema(content, c, rowIndex, data, setter, extSetter) : content }
 			</TCell>);
 	});
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas, extSetter}){
  	const [theData, setTheData]= useState(data);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
@@ -78,7 +78,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 			setDir(ori * -1);
 		};
 
-    return (<TableContext.Provider value={{ theData, setter:setTheData, schema, sortKey, aux, sortSchemas, cellClicks:clickSchemas }}>
+    return (<TableContext.Provider value={{ theData, setter:setTheData, schema, sortKey, aux, sortSchemas, cellClicks:clickSchemas, extSetter }}>
 		<table {...tableAttrs}>
 				<thead>
 					<TRow

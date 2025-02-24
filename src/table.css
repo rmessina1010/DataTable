@@ -37,3 +37,13 @@ td,th {
     border: 1px solid;
     padding: 6px;
 }
+
+td img{
+    max-width: 50px;
+}
+
+#columns + input {
+    margin: 0 .5em;
+}
+
+table { margin-bottom: .5em;}

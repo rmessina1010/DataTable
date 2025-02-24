@@ -25,7 +25,7 @@ export class Url extends Component {
         return (
             <div className='demo-ctrl'>
                 <div className='url-group'>
-                    <label>Enter Source URL: </label>
+                    <label htmlFor='sourceURL'>Enter Source URL: </label>
                     <input name='sourceURL' placeholder={phURL} id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
                     <button className='ctr-btn' onClick={() => this.update(this.state.url)}>Apply</button>
                     <button className='ctr-btn' onClick={() => this.setState({ url: this.state.url ? '' : phURL })}>{this.state.url ? 'Clear' : 'Default'}</button>
@@ -44,9 +44,9 @@ const Filter = ({changeFilt, cols})=>{
     const colVal = useRef()
     const invert = useRef()
     return (<div className='demo-ctrl'>
-        <label>Column: </label>
-        <select ref={colVal}>
-            {cols.map(col=><option value={col}>{col}</option>)}
+        <label htmlFor ="columns">Column: </label>
+        <select id ="columns" ref={colVal}>
+            {cols.map(col=><option key ={col} value={col}>{col}</option>)}
         </select>
         <input  ref={needleVal}/>
         <button onClick={ ()=>changeFilt({col:colVal.current.value, needle: needleVal.current.value, invert: invert.current.checked}) }>Filter</button>
@@ -67,16 +67,30 @@ class MainComponent extends Component {
                 col:'',
                 needle:'',
                 invert: false
-            }
+            },
+            quicKdata :[
+                        {a:1, b:2, c:3, d:4, e:5},
+                        {a:2, b:2, c:4, d:4, e:5},
+                        {a:1, b:2, c:2, d:4, e:5},
+                        {a:3, b:2, c:5, d:4, e:5},
+                        {a:4, b:2, c:10, d:4, e:5},
+                        {a:5, b:2, c:7, d:4, e:5},
+                        {a:6, b:2, c:2, d:4, e:5}
+                    ]
         }
         this.changeURL = this.changeURL.bind(this);
-    }
+        this.expSetter = this.expSetter.bind(this);
+     }
 
     changeURL(newURL) {
-        this.setState({ ...this.state, source: newURL  })
+        this.setState({ ...this.state, source: newURL  });
     }
     changeFilter(newFilter) {
-        this.setState({ ...this.state, filter: newFilter  })
+        this.setState({ ...this.state, filter: newFilter  });
+    }
+
+    expSetter(newState){
+        this.setState({ ...this.state, ...newState });
     }
 
     render() {
@@ -95,7 +109,7 @@ class MainComponent extends Component {
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
                         renderSchemas:{
-                            image: i=> i && <img src={i} alt='' height="50"/>,
+                            image: i=> i && <img src={i} alt=''/>,
                             website: i=><a href={i}>{i}</a>,
                             email: i=><a href={`mailto:${i}`}>{i}</a>,
                             address:  this.props.dataT.rendCols.address,
@@ -125,27 +139,27 @@ class MainComponent extends Component {
                 </FetchDataWrapper>
 
                 <DataTable2
-                    data={[
-                        {a:1, b:2, c:3, d:4, e:5},
-                        {a:2, b:2, c:4, d:4, e:5},
-                        {a:1, b:2, c:2, d:4, e:5},
-                        {a:3, b:2, c:5, d:4, e:5},
-                        {a:4, b:2, c:10, d:4, e:5},
-                        {a:5, b:2, c:7, d:4, e:5},
-                        {a:6, b:2, c:2, d:4, e:5}
-                    ]}
+                    data={ this.state.quicKdata  }
                     schema={['a','d','c','e','remove']}
                     rowAction={ ({data, rowIndex})=>alert(data[rowIndex].a)}
                     renderSchemas={ {
                         c: (d,k,i,r)=><a href={r.a}>{d}</a> ,
-                        remove:(d,k,i,r,s)=>{ return <button onClick={(e)=>{ e.stopPropagation(); s(r.filter((v,ki)=> ki!==i))}}>{k} {i}</button> }
+                        remove:(d,k,i,r,s,es)=>{ return <button
+                            onClick={(e)=>{
+                                e.stopPropagation();
+                                es({ quicKdata: r.filter((v,ki)=> ki!==i)});
+                            }}
+                            >{k} {i}</button> }
                     }}
+                    skipClick={['remove']}
+                    extSetter= {this.expSetter}
                     clickSchemas ={{
                             c: ({content})=>alert(JSON.stringify(content)),
                             // remove:({rowIndex,setter})=> {alert(setter);}
                      } }
 
                 />
+                <button onClick ={()=> this.setState((prev)=>{return {...prev, quicKdata: prev.quicKdata.length > 0 ? [...prev.quicKdata , prev.quicKdata[Math.floor(Math.random() * (prev.quicKdata.length))]] : [] }}) }>Add Row</button>
             </div>
         );
     }
