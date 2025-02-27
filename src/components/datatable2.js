@@ -17,11 +17,12 @@ function TCell({th, action, col, className, children, activeCol, rowIndex}) {
     return <Tag {...attributes}>{children} </Tag>;
 }
 
-function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  activeCol}){
+function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirClass, skipEmpty,  activeCol, privRend}){
  	const { schema, theData:data, setter, aux, cellClicks, sortSchemas, extSetter} = useContext (TableContext);
 	const doAction= !isHead && typeof rowClicks === 'function' ? (e)=>rowClicks({e, content:data[rowIndex], data, rowIndex, activeCol, setter, aux, sortSchemas, extSetter}) : undefined;
 	const kprefix = isHead ? 'th' : 'td';
 	const noClick = Array.isArray (skipClick) ? skipClick : [];
+	const defaultRenderSchema = (v) => (/string|number|boolean|symbol|undefined/).test(typeof v) || v === null ? v : privRend || JSON.stringify(v);
 	if (!isHead && skipEmpty){
 		if ( !Object.keys(data[rowIndex])?.length || (schema.filter(s => data[rowIndex][s] !== undefined).length === 0)) {return null}
 	}
@@ -32,7 +33,7 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirC
 		const classes = (isHead && c === activeCol) ? ` ${dirClass}` : '';
 		const content = isHead ? c : data[rowIndex][c];
 		const renderSchema = typeof renderSchemas === 'function' ? renderSchemas :
-					(typeof renderSchemas?.[c] === 'function' ? renderSchemas[c] : undefined);
+					(typeof renderSchemas?.[c] === 'function' ? renderSchemas[c] : defaultRenderSchema);
 		return ( <TCell
 				th= {isHead}
 				key= {`${kprefix}_${c}`}
@@ -42,13 +43,13 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirC
 				activeCol= {activeCol}
 				rowIndex = {rowIndex }
 			>
-		 		{ renderSchema ? renderSchema(content, c, rowIndex, data, setter, extSetter) : content }
+		 		{renderSchema(content, c, rowIndex, data, setter, extSetter)}
 			</TCell>);
 	});
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas, extSetter}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas, extSetter, privRend}){
  	const [theData, setTheData]= useState(data);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
@@ -57,8 +58,9 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 
 	const valFinderFoo = (col)=>{
 		if (typeof sortSchemas === 'function')  {return sortSchemas ;}
-		if (typeof sortSchemas?.[col] === 'function')  return( sortSchemas[col])
-		return v => v;
+		if (typeof sortSchemas?.[col] === 'function')  { return( sortSchemas[col]); }
+		return v => v ;
+;
 	}
 
 	const filteredData = () => (typeof filterSchemas?.foo !== 'function' || filterSchemas.needle === '') ? theData
@@ -98,6 +100,7 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 						rowClicks={rowAction}
 						rowIndex={i}
 						skipEmpty={skipEmpty}
+						privRend = {privRend}
 				/>})}</tbody>
 			</table>
 		</TableContext.Provider>);

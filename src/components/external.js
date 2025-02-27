@@ -5,19 +5,21 @@ export class Url extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            url: this.props.default || null
+            url: this.props.default || '',
+            objkey: ''
         }
         this.handleChange = this.handleChange.bind(this);
         this.update = this.update.bind(this);
     }
 
     handleChange(e) {
-        console.log(e.target);
-        this.setState({ url: e.target.value });
+        // console.log(e.target);
+        const key = e.target.id === 'sourceURL' ? 'url' : 'objkey';
+        this.setState({...this.state, [key]: e.target.value });
     }
 
-    update(what) {
-        this.props.update(what);
+    update(what,newKey) {
+        this.props.update(what, newKey);
     }
 
     render() {
@@ -27,8 +29,10 @@ export class Url extends Component {
                 <div className='url-group'>
                     <label htmlFor='sourceURL'>Enter Source URL: </label>
                     <input name='sourceURL' placeholder={phURL} id='sourceURL' value={this.state.url} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url) : null} />
-                    <button className='ctr-btn' onClick={() => this.update(this.state.url)}>Apply</button>
-                    <button className='ctr-btn' onClick={() => this.setState({ url: this.state.url ? '' : phURL })}>{this.state.url ? 'Clear' : 'Default'}</button>
+                    <label htmlFor='objkey'>/</label>
+                    <input name='objkey' id='objkey' value={this.state.objkey} onChange={this.handleChange} onKeyUp={e => e.keyCode === 13 ? this.update(this.state.url, this.state.objkey) : null} />
+                    <button className='ctr-btn' onClick={() => this.update(this.state.url, this.state.objkey)}>Apply</button>
+                    <button className='ctr-btn' onClick={() => this.setState({ url: this.state.url ? '' : phURL , objkey: '' })}>{this.state.url ? 'Clear' : 'Default'}</button>
                 </div>
                 <div>
                     <button className='ctr-btn' onClick={() => this.update(this.props.sample)}>Or Use Internal Sample Data</button>
@@ -48,8 +52,10 @@ const Filter = ({changeFilt, cols})=>{
         <select id ="columns" ref={colVal}>
             {cols.map(col=><option key ={col} value={col}>{col}</option>)}
         </select>
-        <input  ref={needleVal}/>
-        <button onClick={ ()=>changeFilt({col:colVal.current.value, needle: needleVal.current.value, invert: invert.current.checked}) }>Filter</button>
+        <label>
+            <input  ref={needleVal}/>
+            <button onClick={ ()=>changeFilt({col:colVal.current.value, needle: needleVal.current.value, invert: invert.current.checked}) }>Filter</button>
+        </label>
         <label> <input type="checkbox" ref={invert}/> Invert </label>
 
     </div>)
@@ -60,6 +66,7 @@ class MainComponent extends Component {
         super(props);
         this.state = {
             url: this.props.url,
+            objkey: this.props.objkey,
             t: 15,
             source: this.props.url,
             force: false,
@@ -82,9 +89,10 @@ class MainComponent extends Component {
         this.expSetter = this.expSetter.bind(this);
      }
 
-    changeURL(newURL) {
-        this.setState({ ...this.state, source: newURL  });
+    changeURL(newURL, newKey) {
+        this.setState({ ...this.state, source: newURL, objkey: newKey });
     }
+
     changeFilter(newFilter) {
         this.setState({ ...this.state, filter: newFilter  });
     }
@@ -105,6 +113,7 @@ class MainComponent extends Component {
 
                 <FetchDataWrapper
                     source={this.state.source}
+                    objkey={this.state.objkey}
                     setFilt = {this.changeFilter.bind(this)}
                     // schema={['GLIID','inGList','GLICat','ItemName', 'Needed','QTY', 'image','notes', 'GLIOrd']}
                     options={{
@@ -132,8 +141,9 @@ class MainComponent extends Component {
                                 if (row[col]=== undefined) {return true}
                                 const result = (findMe(row[col]).toString().indexOf(needle) > -1);
                                 return  inv ? !result : result;
-                            }
+                            },
                         },
+                        privRend: 'This field requires a custom render schema!!'
                     }}
                 >
                 </FetchDataWrapper>
@@ -143,11 +153,11 @@ class MainComponent extends Component {
                     schema={['a','d','c','e','remove']}
                     rowAction={ ({data, rowIndex})=>alert(data[rowIndex].a)}
                     renderSchemas={ {
-                        c: (d,k,i,r)=><a href={r.a}>{d}</a> ,
-                        remove:(d,k,i,r,s,es)=>{ return <button
+                        c: (d,k,i,data)=><a href={`#${data[i].c}`}>{d}</a> ,
+                        remove:(d,k,i,data,s,es)=>{ return <button
                             onClick={(e)=>{
                                 e.stopPropagation();
-                                es({ quicKdata: r.filter((v,ki)=> ki!==i)});
+                                es({ quicKdata: data.filter((v,ki)=> ki!==i)});
                             }}
                             >{k} {i}</button> }
                     }}
@@ -165,7 +175,7 @@ class MainComponent extends Component {
     }
 }
 
-export const FetchDataWrapper = ({source, schema, options, setFilt})=>{
+export const FetchDataWrapper = ({source, schema, options, setFilt, objkey})=>{
     const [theData, setTheData] = useState([]);
     const [stat, setStat] = useState('start');
     const [theSchema, setTheSchema] = useState(Array.isArray(schema)? schema : []);
@@ -175,22 +185,24 @@ export const FetchDataWrapper = ({source, schema, options, setFilt})=>{
             fetch(source, { signal })
                 .then(resp => resp.status === 200 ? resp.json() : null)
                 .then(resp => {
-                    setStat(resp ? null: 'connection failure.');
-                    setTheData(resp);
-                    if (!Array.isArray(schema)){ setTheSchema(Object.keys(resp[0] || [])) }
+                    setStat(s=>resp ? null: 'connection failure.');
+                    const datas =  Array.isArray(resp) ? resp : (objkey ? resp[objkey] : null)  ;
+                    setStat(s=>Array.isArray(datas) ? null: 'bad API format.');
+                    setTheData(datas);
+                    if (!Array.isArray(schema)){ setTheSchema(Object.keys(datas[0] || [])) }
                 })
                 .catch(reps => setTheData([]));
         }else{
             setTheData(Array.isArray(source) ? source : []);
             if (!Array.isArray(schema)){ setTheSchema(Object.keys(source[0] || [])) }
         }
-    }, [schema, source]);
+    }, [schema, source, objkey]);
 
     useEffect(()=>{
         const  controller = new AbortController();
         refreshData( controller.signal);
         return ()=> controller.abort();
-    }, [source, refreshData]);
+    }, [refreshData]);
 
     const cleanOptions = typeof setFilt === 'function' ? options : {...options, filterSchemas:null};
     return stat ||

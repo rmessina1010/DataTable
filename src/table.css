@@ -27,6 +27,8 @@ table {
     border: 3px solid black;
     border-collapse: collapse;
     border-radius: 8px;
+    table-layout: fixed;
+    max-width: 100%;
 }
 
 th {
@@ -42,7 +44,7 @@ td img{
     max-width: 50px;
 }
 
-#columns + input {
+#columns + label>input {
     margin: 0 .5em;
 }
 
