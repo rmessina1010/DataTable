@@ -49,7 +49,7 @@ function TRow({rowClicks, renderSchemas, isHead=false, rowIndex, skipClick, dirC
     return <tr onClick={doAction}>{cells}</tr>;
 }
 
-export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas, extSetter, privRend}){
+export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, data, skipClick, rowAction, tableAttrs, skipEmpty, sortSchemas, aux={}, filterSchemas, clickSchemas, extSetter, privRend, extSort}){
  	const [theData, setTheData]= useState(data);
     const [sortKey,setSortKey]= useState(null);
     const [dir,setDir]= useState(1);
@@ -60,7 +60,6 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 		if (typeof sortSchemas === 'function')  {return sortSchemas ;}
 		if (typeof sortSchemas?.[col] === 'function')  { return( sortSchemas[col]); }
 		return v => v ;
-;
 	}
 
 	const filteredData = () => (typeof filterSchemas?.foo !== 'function' || filterSchemas.needle === '') ? theData
@@ -73,10 +72,12 @@ export function DataTable2({keyCol, schema, headRenderSchemas, renderSchemas, da
 				setSortKey(col);
 				ori = 1;
 			}
- 			const sortedData = [...theData].sort((a, b) => {
-				return getVal(a[col]) <= getVal(b[col]) ?  -1 * ori : ori ;
-			});
-			setTheData(sortedData);
+ 			const sortedData = [...theData].sort((a, b) => { return getVal(a[col]) <= getVal(b[col]) ?  -1 * ori : ori; });
+			if (!extSort) { setTheData(sortedData);}
+			else {
+				const newState = typeof extSort === 'function' ? extSort(sortedData) : sortedData;
+				extSetter(newState);
+			}
 			setDir(ori * -1);
 		};
 

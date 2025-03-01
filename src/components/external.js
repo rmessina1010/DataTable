@@ -57,7 +57,6 @@ const Filter = ({changeFilt, cols})=>{
             <button onClick={ ()=>changeFilt({col:colVal.current.value, needle: needleVal.current.value, invert: invert.current.checked}) }>Filter</button>
         </label>
         <label> <input type="checkbox" ref={invert}/> Invert </label>
-
     </div>)
 }
 
@@ -123,8 +122,8 @@ class MainComponent extends Component {
                             email: i=><a href={`mailto:${i}`}>{i}</a>,
                             address:  this.props.dataT.rendCols.address,
                             company: this.props.dataT.rendCols.company
-
                         },
+                        extSort: true,
                         sortSchemas: this.props.dataT.sortSchemas,
                         clickSchemas:{
                             phone: ({content})=>alert(JSON.stringify(content))
@@ -138,7 +137,7 @@ class MainComponent extends Component {
                             invert: this.state.filter.invert,
                             foo: (row,col,inv,makeFind,needle)=>{
                                 const findMe= makeFind(col);
-                                if (row[col]=== undefined) {return true}
+                                if (row[col]=== undefined) {return false}
                                 const result = (findMe(row[col]).toString().indexOf(needle) > -1);
                                 return  inv ? !result : result;
                             },
@@ -163,6 +162,7 @@ class MainComponent extends Component {
                     }}
                     skipClick={['remove']}
                     extSetter= {this.expSetter}
+                    extSort= {false} // {d=>{return {quicKdata:d}}}
                     clickSchemas ={{
                             c: ({content})=>alert(JSON.stringify(content)),
                             // remove:({rowIndex,setter})=> {alert(setter);}
@@ -170,6 +170,7 @@ class MainComponent extends Component {
 
                 />
                 <button onClick ={()=> this.setState((prev)=>{return {...prev, quicKdata: prev.quicKdata.length > 0 ? [...prev.quicKdata , prev.quicKdata[Math.floor(Math.random() * (prev.quicKdata.length))]] : [] }}) }>Add Row</button>
+                <button onClick ={()=>alert(JSON.stringify(this.state.quicKdata))}>show</button>
             </div>
         );
     }
@@ -204,7 +205,10 @@ export const FetchDataWrapper = ({source, schema, options, setFilt, objkey})=>{
         return ()=> controller.abort();
     }, [refreshData]);
 
-    const cleanOptions = typeof setFilt === 'function' ? options : {...options, filterSchemas:null};
+    const cleanOptions = {...options,
+        filterSchemas: typeof setFilt !== 'function' ? null : options.filterSchemas,
+        extSetter: options.extSort ? setTheData : options.extSetter
+    };
     return stat ||
         <>
             { typeof setFilt === 'function' ? <Filter cols={Object.keys(theData[0] || {})} changeFilt={setFilt}/> : null }
