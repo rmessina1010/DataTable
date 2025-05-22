@@ -162,15 +162,15 @@ class MainComponent extends Component {
                     }}
                     skipClick={['remove']}
                     extSetter= {this.expSetter}
-                    extSort= {false} // {d=>{return {quicKdata:d}}}
+                    extSort= {d=>{return {quicKdata:d}}}
                     clickSchemas ={{
                             c: ({content})=>alert(JSON.stringify(content)),
                             // remove:({rowIndex,setter})=> {alert(setter);}
                      } }
 
                 />
-                <button onClick ={()=> this.setState((prev)=>{return {...prev, quicKdata: prev.quicKdata.length > 0 ? [...prev.quicKdata , prev.quicKdata[Math.floor(Math.random() * (prev.quicKdata.length))]] : [] }}) }>Add Row</button>
-                <button onClick ={()=>alert(JSON.stringify(this.state.quicKdata))}>show</button>
+                <button className="ctr-btn nlm" onClick ={()=> this.setState((prev)=>{return {...prev, quicKdata: prev.quicKdata.length > 0 ? [...prev.quicKdata , prev.quicKdata[Math.floor(Math.random() * (prev.quicKdata.length))]] : [] }}) }>Add Row</button>
+                <button className="ctr-btn" onClick ={()=>alert(JSON.stringify(this.state.quicKdata))}>show</button>
             </div>
         );
     }

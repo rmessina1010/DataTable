@@ -1,6 +1,6 @@
 import { useState , useEffect, createContext, useContext} from "react";
 
-const TableContext = createContext({setter:()=>2});
+const TableContext = createContext({});
 
 function TCell({th, action, col, className, children, activeCol, rowIndex}) {
 	const { theData:data  , aux, sortSchemas, setter, extSetter} = useContext (TableContext);
